@@ -1,0 +1,146 @@
+[DIALOG_OPTIONS]
+LcncDialog-geometry = 0 0 640 480
+EntryDialog-geometry = 992 282 206 102
+toolDialog_play_sound = False
+toolDialog_sound_type = RING
+ToolChangeDialog-geometry = 400 200 296 98
+toolDialog_speak = False
+FileDialog-geometry = 0 0 633 408
+fileDialog_play_sound = False
+fileDialog_sound_type = RING
+OriginOffsetDialog-geometry = 0 0 640 480
+MachineLogDialog-geometry = 0 0 640 480
+MachineLogDialog_play_sound = False
+MachineLogDialog_sound_type = RING
+EntryDialog_play_sound = False
+EntryDialog_sound_type = READY
+RunFromLineDialog_play_sound = False
+RunFromLineDialog_sound_type = READY
+
+[BOOK_KEEPING]
+last_loaded_directory = /home/pi/linuxcnc/nc_files
+last_loaded_file = /home/pi/linuxcnc/nc_files/Dragon.ngc
+RecentPath_0 = /home/jim/linuxcnc/nc_files/Touch_Probe/Top_cap_drill_T10.ngc
+style_QSS_Path = /home/pi/linuxcnc/configs/vtk_dragon/dark_grey.qss
+last_saved_directory = /home/jim/linuxcnc/nc_files
+RecentSavedPath_0 = /home/jim/linuxcnc/nc_files/junk_00.ngc
+
+[SCREEN_OPTIONS]
+catch_errors = True
+desktop_notify = True
+shutdown_check = True
+sound_player_on = False
+mainwindow_geometry = 2 68 1440 860
+
+[MCH_MSG_OPTIONS]
+mchnMsg_play_sound = False
+mchnMsg_speak_errors = False
+mchnMsg_sound_type = ERROR
+
+[USR_MSG_OPTIONS]
+usermsg_play_sound = False
+userMsg_sound_type = RING
+userMsg_use_focusOverlay = True
+
+[SHUTDOWN_OPTIONS]
+shutdown_play_sound = False
+shutdown_alert_sound_type = ATTENTION
+shutdown_exit_sound_type = LOGOUT
+shutdown_msg_title = Do you want to Shutdown now?
+shutdown_msg_detail = This option can be changed in the preference file
+
+[NOTIFY_OPTIONS]
+notify_start_greeting = False
+notify_start_title = Welcome
+notify_start_detail = This option can be changed in the preference file
+notify_start_timeout = 5
+
+[CUSTOM_FORM_ENTRIES]
+Tool to load = 2
+Reload program = False
+Reload tool = True
+Use keyboard = True
+Run from line = True
+External offsets = True
+Eoffset count = 30
+Laser X = 106.9
+Laser Y = -16.85
+Sensor X = 15.5
+Sensor Y = 16.6
+Work Height = 19.2
+Touch Height = 29.6
+Search Velocity = 200.0
+Probe Velocity = 100.0
+Max Probe = 40.1
+Sensor Height = 39.6
+Use virtual keyboard = False
+Use alpha display mode = True
+Use tool sensor = True
+Use camera = False
+Camera X = 14.2
+Camera Y = -15.7
+Use tool touchplate = False
+
+[PROBE OPTIONS]
+Probe tool = 90
+Probe rapid = 100.0
+Probe max xy = 10.0
+Probe max z = 4.0
+Probe extra depth = 0.0
+Probe step off = 10.0
+Probe feed = 50.0
+Probe xy clearance = 10.0
+Probe z clearance = 10.0
+Probe edge width = 10.0
+Probe diameter = 4
+Probe search = 10
+Probe max travel = 10
+Calibration offset = 0
+Cal x width = 0
+Cal y width = 0
+Cal diameter = 0
+
+[DIALOG_GEOMETRY]
+ToolChangeDialog-geometry = 0 0 256 124
+LncMessage-geometry = 0 0 640 480
+FileDialog-geometry = 64 625 633 408
+axisToolButtonDialog_ENTRY = 435 230 206 100
+RunFromLineDialog-geometry = 691 336 329 222
+
+[VERSA_PROBE_OPTIONS]
+ps_searchvel = 300.0
+ps_probevel = 10.0
+ps_z_clearance = 3.0
+ps_probe_max = 1.0
+ps_probe_latch = 0.5
+ps_probe_diam = 2.0
+ps_xy_clearance = 5.0
+ps_side_edge_length = 5.0
+ps_probe_height = 20.0
+ps_block_height = 20.0
+ps_offs_x = 0.0
+ps_offs_y = 0.0
+ps_offs_z = 0.0
+ps_offs_angle = 0.0
+ps_probe_rapid_vel = 60.0
+
+[ORIGINOFFSET_SYSTEM_NAMES]
+__dialogOffsetViewWidget-G54 = User System 1
+__dialogOffsetViewWidget-G55 = User System 2
+__dialogOffsetViewWidget-G56 = User System 3
+__dialogOffsetViewWidget-G57 = User System 4
+__dialogOffsetViewWidget-G58 = User System 5
+__dialogOffsetViewWidget-G59 = User System 6
+__dialogOffsetViewWidget-G59.1 = User System 7
+__dialogOffsetViewWidget-G59.2 = User System 8
+__dialogOffsetViewWidget-G59.3 = User System 9
+offset_table-G54 = User System 1
+offset_table-G55 = User System 2
+offset_table-G56 = User System 3
+offset_table-G57 = User System 4
+offset_table-G58 = User System 5
+offset_table-G59 = User System 6
+offset_table-G59.1 = User System 7
+offset_table-G59.2 = User System 8
+offset_table-G59.3 = User System 9
+
