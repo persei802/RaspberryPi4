@@ -306,8 +306,8 @@ class VTKBackPlot(QVTKRenderWindowInteractor, BaseBackPlot):
         self.renderer_window.Render()
 #        self.interactor.Start()
         # background colours
-        self._background_color = QColor(0, 0, 0, 255)
-        self._background_color2 = QColor(30, 30, 30, 255)
+        self._background_color = QColor(10, 10, 10, 255)
+        self._background_color2 = QColor(60, 60, 60, 255)
 
         self.delay = 0
         STATUS.connect('file-loaded', lambda w, filename: self.load_program(filename))
@@ -331,7 +331,9 @@ class VTKBackPlot(QVTKRenderWindowInteractor, BaseBackPlot):
 
         # view settings
         self.showProgramBounds(True)
+        self.showProgramLabels(False)
         self.showMachineBounds(True)
+        self.showMachineLabels(False)
         self.setViewP()
 
     # Handle the mouse button events.
@@ -813,6 +815,22 @@ class VTKBackPlot(QVTKRenderWindowInteractor, BaseBackPlot):
                     extents.ZAxisVisibilityOff()
         self.update_render()
 
+    def showProgramLabels(self, show):
+        self.show_extents = show
+        PathBoundaries.show_program_labels = show
+        for origin, actor in self.path_actors.items():
+            extents = self.extents[origin]
+            if extents is not None:
+                if show:
+                    extents.XAxisLabelVisibilityOn()
+                    extents.YAxisLabelVisibilityOn()
+                    extents.ZAxisLabelVisibilityOn()
+                else:
+                    extents.XAxisLabelVisibilityOff()
+                    extents.YAxisLabelVisibilityOff()
+                    extents.ZAxisLabelVisibilityOff()
+        self.update_render()
+
     def showMachineBounds(self, show):
         if show:
             self.machine_actor.XAxisVisibilityOn()
@@ -822,6 +840,17 @@ class VTKBackPlot(QVTKRenderWindowInteractor, BaseBackPlot):
             self.machine_actor.XAxisVisibilityOff()
             self.machine_actor.YAxisVisibilityOff()
             self.machine_actor.ZAxisVisibilityOff()
+        self.update_render()
+
+    def showMachineLabels(self, show):
+        if show:
+            self.machine_actor.XAxisLabelVisibilityOn()
+            self.machine_actor.YAxisLabelVisibilityOn()
+            self.machine_actor.ZAxisLabelVisibilityOn()
+        else:
+            self.machine_actor.XAxisLabelVisibilityOff()
+            self.machine_actor.YAxisLabelVisibilityOff()
+            self.machine_actor.ZAxisLabelVisibilityOff()
         self.update_render()
 
     @pyqtProperty(QColor)
@@ -848,23 +877,23 @@ class VTKBackPlot(QVTKRenderWindowInteractor, BaseBackPlot):
 # this draws the program boundary outline
 class PathBoundaries:
     show_program_bounds = bool()
+    show_program_labels = bool()
     def __init__(self, camera, path_actor):
         self.path_actor = path_actor
         bounds = self.path_actor.GetBounds()
-        xmin = bounds[0]
-        xmax = bounds[1]
-        ymin = bounds[2]
-        ymax = bounds[3]
-        zmin = bounds[4]
-        zmax = bounds[5]
-
         cube_axes_actor = vtk.vtkCubeAxesActor()
         cube_axes_actor.SetBounds(bounds)
         cube_axes_actor.SetCamera(camera)
-        cube_axes_actor.SetFlyModeToStaticEdges()
-        cube_axes_actor.GetXAxesLinesProperty().SetColor(0.8, 0.0, 0.3)
-        cube_axes_actor.GetYAxesLinesProperty().SetColor(0.8, 0.0, 0.3)
-        cube_axes_actor.GetZAxesLinesProperty().SetColor(0.8, 0.0, 0.3)
+        cube_axes_actor.SetFlyModeToStaticTriad()
+        cube_axes_actor.GetTitleTextProperty(0).SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetTitleTextProperty(1).SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetTitleTextProperty(2).SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetLabelTextProperty(0).SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetLabelTextProperty(1).SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetLabelTextProperty(2).SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetXAxesLinesProperty().SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetYAxesLinesProperty().SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetZAxesLinesProperty().SetColor(0.7, 0.0, 0.1)
 
         if PathBoundaries.show_program_bounds is True:
             cube_axes_actor.XAxisVisibilityOn()
@@ -875,12 +904,18 @@ class PathBoundaries:
             cube_axes_actor.YAxisVisibilityOff()
             cube_axes_actor.ZAxisVisibilityOff()
 
-        cube_axes_actor.XAxisTickVisibilityOff()
-        cube_axes_actor.YAxisTickVisibilityOff()
-        cube_axes_actor.ZAxisTickVisibilityOff()
-        cube_axes_actor.XAxisLabelVisibilityOff()
-        cube_axes_actor.YAxisLabelVisibilityOff()
-        cube_axes_actor.ZAxisLabelVisibilityOff()
+        if PathBoundaries.show_program_labels is True:
+            cube_axes_actor.XAxisLabelVisibilityOn()
+            cube_axes_actor.YAxisLabelVisibilityOn()
+            cube_axes_actor.ZAxisLabelVisibilityOn()
+        else:
+            cube_axes_actor.XAxisLabelVisibilityOff()
+            cube_axes_actor.YAxisLabelVisibilityOff()
+            cube_axes_actor.ZAxisLabelVisibilityOff()
+
+        cube_axes_actor.XAxisMinorTickVisibilityOff()
+        cube_axes_actor.YAxisMinorTickVisibilityOff()
+        cube_axes_actor.ZAxisMinorTickVisibilityOff()
         self.actor = cube_axes_actor
         
     def get_actor(self):
@@ -932,18 +967,27 @@ class Machine:
         zmax = axis[2]["max_position_limit"]
         zmin = axis[2]["min_position_limit"]
         cube_axes_actor.SetBounds(xmin, xmax, ymin, ymax, zmin, zmax)
-        cube_axes_actor.SetFlyModeToStaticEdges()
-        cube_axes_actor.GetXAxesLinesProperty().SetColor(0.8, 0.0, 0.3)
-        cube_axes_actor.GetYAxesLinesProperty().SetColor(0.8, 0.0, 0.3)
-        cube_axes_actor.GetZAxesLinesProperty().SetColor(0.8, 0.0, 0.3)
-        cube_axes_actor.XAxisTickVisibilityOff()
-        cube_axes_actor.YAxisTickVisibilityOff()
-        cube_axes_actor.ZAxisTickVisibilityOff()
-        cube_axes_actor.XAxisLabelVisibilityOff()
-        cube_axes_actor.YAxisLabelVisibilityOff()
-        cube_axes_actor.ZAxisLabelVisibilityOff()
-        cube_axes_actor.GetProperty().SetLineStipplePattern(0xf0f0)
-        cube_axes_actor.GetProperty().SetLineStippleRepeatFactor(1)
+        cube_axes_actor.SetFlyModeToStaticTriad()
+        cube_axes_actor.GetTitleTextProperty(0).SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetTitleTextProperty(1).SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetTitleTextProperty(2).SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetLabelTextProperty(0).SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetLabelTextProperty(1).SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetLabelTextProperty(2).SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetXAxesLinesProperty().SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetYAxesLinesProperty().SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.GetZAxesLinesProperty().SetColor(0.7, 0.0, 0.1)
+        cube_axes_actor.XAxisTickVisibilityOn()
+        cube_axes_actor.YAxisTickVisibilityOn()
+        cube_axes_actor.ZAxisTickVisibilityOn()
+        cube_axes_actor.XAxisLabelVisibilityOn()
+        cube_axes_actor.YAxisLabelVisibilityOn()
+        cube_axes_actor.ZAxisLabelVisibilityOn()
+        cube_axes_actor.XAxisMinorTickVisibilityOff()
+        cube_axes_actor.YAxisMinorTickVisibilityOff()
+        cube_axes_actor.ZAxisMinorTickVisibilityOff()
+#        cube_axes_actor.GetProperty().SetLineStipplePattern(0xf0f0)
+#        cube_axes_actor.GetProperty().SetLineStippleRepeatFactor(1)
         self.cube_actor = cube_axes_actor
 
     def get_actor(self):

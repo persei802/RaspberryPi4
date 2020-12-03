@@ -35,6 +35,7 @@ TAB_CAMERA = 6
 TAB_GCODES = 7
 TAB_SETUP = 8
 TAB_SETTINGS = 9
+TAB_ACCESSORIES = 10
 
 class HandlerClass:
     def __init__(self, halcomp, widgets, paths):
@@ -99,6 +100,7 @@ class HandlerClass:
         self.init_widgets()
         self.init_vtk()
         self.init_probe()
+        self.init_utils()
         self.w.stackedWidget_log.setCurrentIndex(0)
         self.w.stackedWidget.setCurrentIndex(0)
         self.w.stackedWidget_dro.setCurrentIndex(0)
@@ -111,6 +113,7 @@ class HandlerClass:
         self.chk_use_touchplate_changed(self.w.chk_use_touchplate.isChecked())
         self.chk_run_from_line_checked(self.w.chk_run_from_line.isChecked())
         self.chk_use_camera_changed(self.w.chk_use_camera.isChecked())
+        self.w.widget_custom_buttons.hide()
     # hide widgets for A axis if not present
         if "A" not in INFO.AVAILABLE_AXES:
             for i in self.axis_a_list:
@@ -133,10 +136,14 @@ class HandlerClass:
         self.w.btn_zoom_in.clicked.connect(self.vtkbackplot.zoomIn)
         self.w.btn_zoom_out.clicked.connect(self.vtkbackplot.zoomOut)
         self.w.btn_view_clear.clicked.connect(self.vtkbackplot.clearLivePlot)
-        self.w.btn_machine_bounds.clicked.connect(lambda state: self.vtkbackplot.showMachineBounds(state))
-        self.w.btn_program_bounds.clicked.connect(lambda state: self.vtkbackplot.showProgramBounds(state))
-#        self.w.btn_view_path.clicked.connect(lambda state: self.vtkbackplot.
-        self.w.chk_alpha_mode.clicked.connect(lambda state: self.vtkbackplot.alphaBlend(state))
+#        self.w.btn_machine_bounds.clicked.connect(lambda state: self.vtkbackplot.showMachineBounds(state))
+#        self.w.btn_program_bounds.clicked.connect(lambda state: self.vtkbackplot.showProgramBounds(state))
+#        self.w.btn_machine_labels.clicked.connect(lambda state: self.vtkbackplot.showMachineLabels(state))
+#        self.w.btn_program_labels.clicked.connect(lambda state: self.vtkbackplot.showProgramLabels(state))
+        self.w.btn_machine_bounds.clicked.connect(self.showMachineBounds)
+        self.w.btn_program_bounds.clicked.connect(self.showProgramBounds)
+        self.w.btn_machine_labels.clicked.connect(self.showMachineLabels)
+        self.w.btn_program_labels.clicked.connect(self.showProgramLabels)
 
     #############################
     # SPECIAL FUNCTIONS SECTION #
@@ -280,6 +287,17 @@ class HandlerClass:
         self.vtkbackplot.setObjectName("vtkbackplot")
         self.w.layout_vtk.addWidget(self.vtkbackplot)
 
+    def init_utils(self):
+        from facing import Facing
+        self.facing = Facing()
+        self.w.layout_facing.addWidget(self.facing)
+        from hole_circle import Hole_Circle
+        self.hole_circle = Hole_Circle()
+        self.w.layout_hole_circle.addWidget(self.hole_circle)
+        from calculator import Calculator
+        self.calculator = Calculator()
+        self.w.layout_calculator.addWidget(self.calculator)
+
     def processed_focus_event__(self, receiver, event):
         if not self.w.chk_use_virtual.isChecked() or STATUS.is_auto_mode(): return
         if isinstance(receiver, QtWidgets.QLineEdit):
@@ -361,11 +379,14 @@ class HandlerClass:
 
     def spindle_pwr_changed(self, data):
         # this calculation assumes the voltage is line to neutral
+        # that the current reported by the VFD is total current for all 3 phases
         # and that the synchronous motor spindle has a power factor of 0.9
-        power = self.h['spindle_volts'] * self.h['spindle_amps'] * 2.7 # 3 x V x I x PF
+        power = self.h['spindle_volts'] * self.h['spindle_amps'] * 0.9 # V x I x PF
         amps = "{:1.1f}".format(self.h['spindle_amps'])
+        volts = "{:1.1f}".format(self.h['spindle_volts'])
         pwr = "{:1.1f}".format(power)
         self.w.lbl_spindle_amps.setText(amps)
+        self.w.lbl_spindle_volts.setText(volts)
         self.w.lbl_spindle_power.setText(pwr)
 
     def spindle_fault_changed(self, data):
@@ -604,6 +625,33 @@ class HandlerClass:
     def btn_maxv_50_clicked(self):
         self.w.slider_maxv_ovr.setValue(self.max_linear_velocity / 2)
 
+    # main tab
+    def showMachineBounds(self, state):
+        self.vtkbackplot.showMachineBounds(state)
+        if not state:
+            self.vtkbackplot.showMachineLabels(False)
+            self.w.btn_machine_labels.setChecked(False)
+
+    def showMachineLabels(self, state):
+        if self.w.btn_machine_bounds.isChecked():
+            self.vtkbackplot.showMachineLabels(state)
+        
+    def showProgramBounds(self, state):
+        self.vtkbackplot.showProgramBounds(state)
+        if not state:
+            self.vtkbackplot.showProgramLabels(False)
+            self.w.btn_program_labels.setChecked(False)
+
+    def showProgramLabels(self, state):
+        if self.w.btn_program_bounds.isChecked():
+            self.vtkbackplot.showProgramLabels(state)
+
+    def btn_custom_clicked(self, state):
+        if state:
+            self.w.widget_custom_buttons.show()
+        else:
+            self.w.widget_custom_buttons.hide()
+
     # file tab
     def btn_gcode_edit_clicked(self, state):
         if not STATUS.is_on_and_idle():
@@ -733,11 +781,10 @@ class HandlerClass:
             print("Override limits not set")
 
     def chk_run_from_line_checked(self, state):
-#        self.w.gcodegraphics.set_inhibit_selection(not state)
         self.w.btn_start.setText("START\n1") if state else self.w.btn_start.setText("START")
 
-#    def chk_alpha_mode_changed(self, state):
-#        self.vtkbackplot.alphaBlend(state)
+    def chk_alpha_mode_changed(self, state):
+        self.vtkbackplot.alphaBlend(state)
 
     def chk_use_camera_changed(self, state):
         self.w.btn_ref_camera.setEnabled(state)
@@ -874,10 +921,16 @@ class HandlerClass:
     def update_rpm(self, speed):
         if int(speed) == 0:
             in_range = True
+            at_speed = True
         else:
             in_range = (self.min_spindle_rpm <= int(speed) <= self.max_spindle_rpm)
+            at_speed = self.h['led_atspeed']
         widget = self.w.lbl_spindle_set
         widget.setProperty('in_range', in_range)
+        widget.style().unpolish(widget)
+        widget.style().polish(widget)
+        widget = self.w.status_rpm
+        widget.setProperty('at_speed', at_speed)
         widget.style().unpolish(widget)
         widget.style().polish(widget)
 

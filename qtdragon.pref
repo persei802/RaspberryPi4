@@ -19,7 +19,7 @@ RunFromLineDialog_sound_type = READY
 
 [BOOK_KEEPING]
 last_loaded_directory = /home/pi/linuxcnc/nc_files
-last_loaded_file = /home/pi/linuxcnc/nc_files/Dragon.ngc
+last_loaded_file = /home/pi/linuxcnc/nc_files/3D Finish.ngc
 RecentPath_0 = /home/jim/linuxcnc/nc_files/Touch_Probe/Top_cap_drill_T10.ngc
 style_QSS_Path = /home/pi/linuxcnc/configs/vtk_dragon/dark_grey.qss
 last_saved_directory = /home/jim/linuxcnc/nc_files
@@ -30,7 +30,7 @@ catch_errors = True
 desktop_notify = True
 shutdown_check = True
 sound_player_on = False
-mainwindow_geometry = 2 68 1440 860
+mainwindow_geometry = 0 32 1440 860
 
 [MCH_MSG_OPTIONS]
 mchnMsg_play_sound = False
@@ -56,11 +56,11 @@ notify_start_detail = This option can be changed in the preference file
 notify_start_timeout = 5
 
 [CUSTOM_FORM_ENTRIES]
-Tool to load = 2
+Tool to load = 13
 Reload program = False
 Reload tool = True
 Use keyboard = True
-Run from line = True
+Run from line = False
 External offsets = True
 Eoffset count = 30
 Laser X = 106.9
